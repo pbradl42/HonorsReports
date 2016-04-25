@@ -1,0 +1,78 @@
+---
+title       : Class of 2016
+subtitle    : Basic demographics of Honors Class of 2016, Ferris State University
+author      : Peter Bradley
+job         : Profile of Honors Class of 2016
+framework   : shower        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [quiz, bootstrap]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+```{r echo="FALSE"}
+source("EnrollmentDescriptives.R")
+fall2014 <- getorientation("201408")
+fall2015 <- getorientation("201508")
+fall2016 <- getorientation("201608")
+```
+## Ethnicity
+```{r}
+byethnicity16 <- table(fall2016$ethnicity)
+byethnicity15 <- table(fall2015$ethnicity)
+byethnicity14 <- table(fall2014$ethnicity)
+byethnicity16$year <- "2016"
+byethnicity15$year <- "2015"
+byethnicity14$year <- "2014"
+ethnicityTotal <- cbind(byethnicity16, byethnicity15, byethnicity14)
+ethnicityTotal$ethnicity <- factor(ethnicityTotal$ethnicity)
+ggplot(ethnicityTotal, aes(x=year, y=count, fill=ethnicity)) + geom_bar(position="stacked", stat="identity") -> p
+p
+```
+--- .class #id 
+
+## Non-White population, with comparrison
+
+```{r}
+nonWhite <- ethnicityTotal[-(ethnicityTotal$ethnicity = "White"),]
+ggplot(nonWhite, aes(x=year, y=count, fill=ethnicity)) + geom_bar(position="stacked", stat="identity") -> p
+p
+```
+
+--- .class #id
+
+## Gender comparrison
+
+```{r, echo=FALSE}
+bygender16 <- table(fall2016$gender)
+bygender15 <- table(fall2015$gender)
+bygender14 <- table(fall2014$gender)
+bygender16$year <- "2016"
+bygender15$year <- "2015"
+bygender14$year <- "2014"
+genderTotal <- cbind(bygender16, bygender15, bygender14)
+genderTotal$gender <- factor(genderTotal$gender)
+ggplot(genderTotal, aes(x=year, y=count, fill=gender)) + geom_bar(position="stacked", stat="identity") -> p
+p
+```
+--- .class #id
+
+## By College
+
+--- .class #id
+
+## Out of State
+
+--- .class #id
+
+## Input Variables
+
+--- .class #id
+
+## Geography
+
+--- .class #id
+
+## What they are proud of:
+
+--- .class #id
