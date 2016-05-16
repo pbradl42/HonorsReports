@@ -1,0 +1,602 @@
+---
+title       : Class of 2016
+subtitle    : Basic demographics of Honors Class of 2016, Ferris State University
+author      : Peter Bradley
+job         : Profile of Honors Class of 2016
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [quiz, bootstrap]            # {mathjax, quiz, bootstrap}
+mode        : standalone # {standalone, draft}
+knit        : slidify::knit2slides
+---
+```{r echo=FALSE, message=FALSE, cache=FALSE}
+ggcolor <- "YlOrRd"
+source("EnrollmentDescriptives.R")
+source("MakeStackedCol.R")
+source("../RTallies/CERAssessment.R")
+library(plyr)
+#fall2010 <- getgraduates("201001")
+#fall2010$gradTerm <- "2010"
+#fall2010$LastCollege[fall2010$LastCollege == "College of Allied Health"] <- "College of Health Professions"
+fall2011 <- getgraduates("201101")
+fall2011$gradTerm <- "2011"
+fall2011$LastCollege[fall2011$LastCollege == "College of Allied Health"] <- "College of Health Professions"
+fall2012 <- getgraduates("201201")
+fall2012$gradTerm <- "2012"
+fall2012$LastCollege[fall2012$LastCollege == "College of Allied Health"] <- "College of Health Professions"
+fall2013 <- getgraduates("201301")
+fall2013$gradTerm <- "2013"
+fall2014 <- getgraduates("201401")
+fall2014$gradTerm <- "2014"
+fall2015 <- getgraduates("201501")
+fall2015$gradTerm <- "2015"
+fall2016 <- getgraduates("201601")
+fall2016$gradTerm <- "2016"
+total <- rbind( fall2011, fall2012, fall2013, fall2014, fall2015, fall2016)
+```
+
+## Ethnicity
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+
+byethnicity16 <- as.data.frame(table(fall2016$Ethnicity))
+byethnicity15 <- as.data.frame(table(fall2015$Ethnicity))
+byethnicity14 <- as.data.frame(table(fall2014$Ethnicity))
+byethnicity13 <- as.data.frame(table(fall2013$Ethnicity))
+byethnicity12 <- as.data.frame(table(fall2012$Ethnicity))
+byethnicity11 <- as.data.frame(table(fall2011$Ethnicity))
+
+ethnicities <- c("American Indian-Alaskan Native", "Asian", "Black or African American", "Hispanic or Latino", "Multiracial", "Unknown", "White")
+
+byethnicity16$year <- "2016"
+byethnicity16$percentage <- round((byethnicity16$Freq / sum(byethnicity16$Freq)) * 100, 1)
+byethnicity15$year <- "2015"
+byethnicity15$percentage <- round((byethnicity15$Freq / sum(byethnicity15$Freq)) * 100, 1)
+byethnicity14$year <- "2014"
+byethnicity14$percentage <- round((byethnicity14$Freq / sum(byethnicity14$Freq)) * 100, 1)
+byethnicity13$year <- "2013"
+byethnicity13$percentage <- round((byethnicity13$Freq / sum(byethnicity13$Freq)) * 100, 1)
+byethnicity12$year <- "2012"
+byethnicity12$percentage <- round((byethnicity12$Freq / sum(byethnicity12$Freq)) * 100, 1)
+byethnicity11$year <- "2011"
+byethnicity11$percentage <- round((byethnicity11$Freq / sum(byethnicity11$Freq)) * 100, 1)
+
+ethnicityTotal <- rbind(byethnicity16, byethnicity15, byethnicity14, byethnicity13, byethnicity12, byethnicity11)
+ethnicityTotal <- ddply(ethnicityTotal, .(year), 
+   transform, pos = cumsum(percentage) - (0.5 * percentage)
+)
+names(ethnicityTotal)[1] <- "Ethnicity"
+ethnicityTotal[order(ethnicityTotal$year, ethnicityTotal$percentage),] -> ethnicityTotal
+ggplot(ethnicityTotal, aes(x=factor(year), y=percentage, fill=factor(Ethnicity))) + geom_bar(stat="identity", aes(fill=factor(Ethnicity))) + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=ethnicityTotal$pos) + scale_y_continuous()-> p
+p <- p + ggtitle("Ethnic distribution of graduates, 2011-2016") + xlab("Year")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+
+p
+```
+
+--- .class #id 
+
+## Non-White population, with Comparison
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+nonWhite <- ethnicityTotal[!(ethnicityTotal$Ethnicity == "White"),]
+nonWhite <- ddply(nonWhite, .(year), 
+   transform, pos = cumsum(percentage) - (0.5 * percentage)
+)
+names(nonWhite)[1] <- "Ethnicity"
+ggplot(nonWhite, aes(x=factor(year), y=percentage, fill=factor(Ethnicity))) + geom_bar(stat="identity", aes(fill=factor(Ethnicity))) + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=nonWhite$pos) + scale_y_continuous()-> p
+p <- p + ggtitle("Percentage of total graduates, non-White populations")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+
+p
+```
+
+--- .class #id
+
+## Gender Comparison
+
+```{r, echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+bygender16 <- as.data.frame(table(fall2016$Gender))
+bygender16$percentage <- round((bygender16$Freq / sum(bygender16$Freq)) * 100, 1)
+
+bygender15 <- as.data.frame(table(fall2015$Gender))
+bygender15$percentage <- round((bygender15$Freq / sum(bygender15$Freq)) * 100, 1)
+
+bygender14 <- as.data.frame(table(fall2014$Gender))
+bygender14$percentage <- round((bygender14$Freq / sum(bygender14$Freq)) * 100, 1)
+
+bygender13 <- as.data.frame(table(fall2013$Gender))
+bygender13$percentage <- round((bygender13$Freq / sum(bygender13$Freq)) * 100, 1)
+
+bygender12 <- as.data.frame(table(fall2012$Gender))
+bygender12$percentage <- round((bygender12$Freq / sum(bygender12$Freq)) * 100, 1)
+
+bygender11 <- as.data.frame(table(fall2011$Gender))
+bygender11$percentage <- round((bygender11$Freq / sum(bygender11$Freq)) * 100, 1)
+
+
+bygender16$year <- "2016"
+bygender15$year <- "2015"
+bygender14$year <- "2014"
+bygender13$year <- "2013"
+bygender12$year <- "2012"
+bygender11$year <- "2011"
+
+genderTotal <- rbind(bygender16, bygender15, bygender14, bygender13, bygender12, bygender11)
+genderTotal$Var1 <- factor(genderTotal$Var1)
+genderTotal <- ddply(genderTotal, .(year), 
+   transform, pos = cumsum(percentage) - (0.5 * percentage)
+)
+names(genderTotal)[1] <- "Gender"
+ggplot(genderTotal, aes(x=year, y=percentage, fill=Gender)) + geom_bar(stat="identity") + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=genderTotal$pos) + scale_y_continuous()-> p
+p <- p + ggtitle("Gender distribution of graduates")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+## By College
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+bycollege <- as.data.frame(table(fall2016$LastCollege))
+bycollege$year <- "2016"
+bycollege$percentage <- round((bycollege$Freq / sum(bycollege$Freq)) * 100, 1)
+
+bycollege5 <- as.data.frame(table(fall2015$LastCollege))
+bycollege5$year <- "2015"
+bycollege5$percentage <- round((bycollege5$Freq / sum(bycollege5$Freq)) * 100, 1)
+
+bycollege4 <- as.data.frame(table(fall2014$LastCollege))
+bycollege4$year <- "2014"
+bycollege4$percentage <- round((bycollege4$Freq / sum(bycollege4$Freq)) * 100, 1)
+
+bycollege3 <- as.data.frame(table(fall2013$LastCollege))
+bycollege3$year <- "2013"
+bycollege3$percentage <- round((bycollege3$Freq / sum(bycollege3$Freq)) * 100, 1)
+
+bycollege2 <- as.data.frame(table(fall2012$LastCollege))
+bycollege2$year <- "2012"
+bycollege2$percentage <- round((bycollege2$Freq / sum(bycollege2$Freq)) * 100, 1)
+
+bycollege1 <- as.data.frame(table(fall2011$LastCollege))
+bycollege1$year <- "2011"
+bycollege1$percentage <- round((bycollege1$Freq / sum(bycollege1$Freq)) * 100, 1)
+
+bycollege <- rbind(bycollege, bycollege5, bycollege4, bycollege3, bycollege2, bycollege1)
+colnames(bycollege) <- c("College", "Frequency", "Year", "percentage")
+toplot <- ddply(bycollege, .(Year), 
+   transform, pos = cumsum(percentage) - (0.5 * percentage)
+)
+p <- ggplot(toplot, aes(x=Year, y=percentage, fill=factor(College))) + geom_bar(stat="identity") + geom_text(aes(label = paste(percentage, "%", sep=""), y=toplot$pos), colour = "black", fontface="bold", size=6)
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+
+```
+
+--- .class #id
+
+## By Major
+```{r echo=FALSE, cache=FALSE}
+as.data.frame(table(fall2016$LastMajor)) -> byMajor
+colnames(byMajor) <- c("Major", "Frequency")
+head(byMajor[order(-byMajor$Frequency),], 10)
+```
+
+--- .class #id
+
+## Other demographics of interest
+
+Student Atheletes: `r table(fall2016$Athlete)[[1]]`
+
+First-generation: `r table(fall2016$First_Generation)[[1]]`
+
+--- .class #id
+
+## Comparison
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+getplace <- function(data, var) { which(colnames(data) == var) }
+source("MakeStackedCol.R")
+#p <- makechart("Athlete", type="count")
+var <- "Athlete"
+type <- "count"
+  bygender16 <- as.data.frame(table(fall2016[,getplace(fall2016, var)]))
+  if(length(bygender16) == 1) {
+    bygender16 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender16$percentage <- round((bygender16$Freq / sum(bygender16$Freq)) * 100, 1)
+  bygender15 <- as.data.frame(table(fall2015[,getplace(fall2015, var)]))
+  if(length(bygender15) == 1) {
+    bygender15 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender15$percentage <- round((bygender15$Freq / sum(bygender15$Freq)) * 100, 1)
+  bygender14 <- as.data.frame(table(fall2014[,getplace(fall2014, var)]))
+  if(length(bygender14) == 1) {
+    bygender14 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender14$percentage <- round((bygender14$Freq / sum(bygender14$Freq)) * 100, 1)
+  
+  bygender13 <- as.data.frame(table(fall2013[,getplace(fall2013, var)]))
+  bygender13$percentage <- round((bygender13$Freq / sum(bygender13$Freq)) * 100, 1)
+#  message(paste("here", nrow(bygender13), sep=" "))
+  bygender12 <- as.data.frame(table(fall2012[,getplace(fall2012, var)]))
+  bygender12$percentage <- round((bygender12$Freq / sum(bygender12$Freq)) * 100, 1)
+  
+  bygender11 <- as.data.frame(table(fall2011[,getplace(fall2011, var)]))
+  bygender11$percentage <- round((bygender11$Freq / sum(bygender11$Freq)) * 100, 1)
+  
+
+  bygender16$year <- "2016"
+  bygender15$year <- "2015"
+  bygender14$year <- "2014"
+  bygender13$year <- "2013"
+  bygender12$year <- "2012"
+  bygender11$year <- "2011"
+
+#  message("here2")
+  myTotal <- rbind(bygender16, bygender15, bygender14, bygender13, bygender12, bygender11)
+  myTotal$Var1 <- factor(myTotal$Var1)
+ # message(myTotal)
+  if (type == "percent") {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(percentage) - (0.5 * percentage)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=percentage, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  } else {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(Freq) - (0.5 * Freq)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=Freq, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(Freq)), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  }
+p <- p + ggtitle("Athletes - graduates")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+## Comparison
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+#p <- makechart("First_Generation", type="count")
+var <- "First_Generation"
+type <- "count"
+  bygender16 <- as.data.frame(table(fall2016[,getplace(fall2016, var)]))
+  if(length(bygender16) == 1) {
+    bygender16 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender16$percentage <- round((bygender16$Freq / sum(bygender16$Freq)) * 100, 1)
+  bygender15 <- as.data.frame(table(fall2015[,getplace(fall2015, var)]))
+  if(length(bygender15) == 1) {
+    bygender15 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender15$percentage <- round((bygender15$Freq / sum(bygender15$Freq)) * 100, 1)
+  bygender14 <- as.data.frame(table(fall2014[,getplace(fall2014, var)]))
+  if(length(bygender14) == 1) {
+    bygender14 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender14$percentage <- round((bygender14$Freq / sum(bygender14$Freq)) * 100, 1)
+  
+  bygender13 <- as.data.frame(table(fall2013[,getplace(fall2013, var)]))
+  bygender13$percentage <- round((bygender13$Freq / sum(bygender13$Freq)) * 100, 1)
+#  message(paste("here", nrow(bygender13), sep=" "))
+  bygender12 <- as.data.frame(table(fall2012[,getplace(fall2012, var)]))
+  bygender12$percentage <- round((bygender12$Freq / sum(bygender12$Freq)) * 100, 1)
+  
+  bygender11 <- as.data.frame(table(fall2011[,getplace(fall2011, var)]))
+  bygender11$percentage <- round((bygender11$Freq / sum(bygender11$Freq)) * 100, 1)
+  
+ 
+  bygender16$year <- "2016"
+  bygender15$year <- "2015"
+  bygender14$year <- "2014"
+  bygender13$year <- "2013"
+  bygender12$year <- "2012"
+  bygender11$year <- "2011"
+
+#  message("here2")
+  myTotal <- rbind(bygender16, bygender15, bygender14, bygender13, bygender12, bygender11)
+  myTotal$Var1 <- factor(myTotal$Var1)
+ # message(myTotal)
+  if (type == "percent") {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(percentage) - (0.5 * percentage)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=percentage, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  } else {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(Freq) - (0.5 * Freq)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=Freq, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(Freq)), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  }
+p <- p + ggtitle("First Generation - graduates")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+## As entering Students
+
+```{r echo=FALSE, warning=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+#p <- makechart("EntranceType", type="count")
+var <- "EntranceType"
+type <- "count"
+  bygender16 <- as.data.frame(table(fall2016[,getplace(fall2016, var)]))
+  if(length(bygender16) == 1) {
+    bygender16 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender16$percentage <- round((bygender16$Freq / sum(bygender16$Freq)) * 100, 1)
+  bygender15 <- as.data.frame(table(fall2015[,getplace(fall2015, var)]))
+  if(length(bygender15) == 1) {
+    bygender15 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender15$percentage <- round((bygender15$Freq / sum(bygender15$Freq)) * 100, 1)
+  bygender14 <- as.data.frame(table(fall2014[,getplace(fall2014, var)]))
+  if(length(bygender14) == 1) {
+    bygender14 <- data.frame(Var1 = "Y", Freq = 0)
+  }
+  bygender14$percentage <- round((bygender14$Freq / sum(bygender14$Freq)) * 100, 1)
+  
+  bygender13 <- as.data.frame(table(fall2013[,getplace(fall2013, var)]))
+  bygender13$percentage <- round((bygender13$Freq / sum(bygender13$Freq)) * 100, 1)
+#  message(paste("here", nrow(bygender13), sep=" "))
+  bygender12 <- as.data.frame(table(fall2012[,getplace(fall2012, var)]))
+  bygender12$percentage <- round((bygender12$Freq / sum(bygender12$Freq)) * 100, 1)
+  
+  bygender11 <- as.data.frame(table(fall2011[,getplace(fall2011, var)]))
+  bygender11$percentage <- round((bygender11$Freq / sum(bygender11$Freq)) * 100, 1)
+  
+ 
+  bygender16$year <- "2016"
+  bygender15$year <- "2015"
+  bygender14$year <- "2014"
+  bygender13$year <- "2013"
+  bygender12$year <- "2012"
+  bygender11$year <- "2011"
+
+#  message("here2")
+  myTotal <- rbind(bygender16, bygender15, bygender14, bygender13, bygender12, bygender11)
+  myTotal$Var1 <- factor(myTotal$Var1)
+ # message(myTotal)
+  if (type == "percent") {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(percentage) - (0.5 * percentage)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=percentage, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(percentage, "%")), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  } else {
+    myTotal <- ddply(myTotal, .(year), 
+                         transform, pos = cumsum(Freq) - (0.5 * Freq)
+    )
+    p <- ggplot(myTotal, aes(x=year, y=Freq, fill=Var1)) + geom_bar(stat="identity") + geom_text(aes(label = paste(Freq)), colour = "black", fontface="bold", size=6, y=myTotal$pos) + scale_y_continuous()
+  }
+p <- p + ggtitle("How students started - by graduates")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+
+
+## Input Conditions: HS_GPA  and ACT_COMP
+
+```{r echo=FALSE, warning=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+p <- ggplot(total, aes(x=gradTerm, y=HS_GPA)) + geom_boxplot()
+p <- p + ylim(0, 4.5)
+p <- p + ggtitle("HS_GPA distribution, 2011-2016 graduates")
+
+q <- ggplot(total, aes(x=gradTerm, y=ACT_COMP)) + geom_boxplot()
+q <- q + ylim(0, 36)
+q <- q + ggtitle("ACT_COMP distribution, 2011-2016 graduates")
+
+
+multiplot(p, q, cols=2)
+```
+
+
+--- .class #id
+
+## How they finished - CumGPA Spring 2016
+
+```{r echo=FALSE, warning=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+p <- ggplot(fall2016, aes(x=LastCumGPA)) + stat_bin(binwidth=0.05) + ylim(c(0, 12)) +  
+    stat_bin(binwidth=0.05, geom="text", aes(label=..count..), vjust=-1.5) 
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+## In Comparison 
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE}
+p <- ggplot(total, aes(x=gradTerm, y=LastCumGPA)) + geom_boxplot()
+p <- p + ggtitle("Last Cumulative GPA distribution, 2011-2016")
+p <- p + scale_fill_brewer(type = "div", palette =  ggcolor) + theme_bw()
+p
+```
+
+--- .class #id
+
+## App for Medallion: How much education?
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE, message=FALSE}
+app4med2016 <- getapp4med("201601")
+app4med2015 <- getapp4med("201501")
+
+app4medTotal <- rbind(app4med2016, app4med2015)
+
+```
+
+```{r echo=FALSE}
+table(app4medTotal$AnticipatedTotalEducation, app4medTotal$LastSemesterAsHonor) -> TotalTable
+strtrim(rownames(TotalTable),25) -> rownames(TotalTable)
+TotalTable
+```
+
+--- .class #id
+
+## App for Medallion: Completion plans
+
+```{r echo=FALSE}
+table(app4medTotal$CompletionPlan, app4medTotal$LastSemesterAsHonor)
+```
+
+--- .class #id
+
+## App for Medallion: Internship
+
+```{r echo=FALSE}
+table(app4medTotal$Internship, app4medTotal$LastSemesterAsHonor)
+```
+
+--- .class #id
+
+## App for Medallion: Study abroad
+
+```{r echo=FALSE}
+table(app4medTotal$StudyAbroad, app4medTotal$LastSemesterAsHonor)
+```
+
+
+--- .class #id
+
+## A little assessment: Cultural events - 2016
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE, message=FALSE}
+source("../RTallies/likertcharts.R")
+ columnnames <- c("CulturalEventsCulturalLiteracy", "CulturalEventsExchangeIdeas", "CulturalEventsIdentify")
+culturalEventQuestions <- sapply(columnnames, getplace, data=app4medTotal)
+#  culturalEventQuestions <- c(61,60,59)
+  #culturalEventQuestions <- which(names(cera)==columnnames)
+  
+  ## Do the same by semester
+  #  items201501 <- sem201501[, grep("CoursesSurveyActivities", names(sem201501))]
+  #  sem201501 <- aa[aa$Semester == "201501", ]
+  message("Starting Cultural events\n")
+  orderCERA <- c("Never", "Rarely", "Sometimes", "Often", "Always")
+  newNamesCERA <- c("Develop cultural and intergenerational...", "Exchange ideas and values...", "Identify one's values...")
+  CERATitle <- "Considering the cultural events you have attended, would you say that they encouraged you to:"
+  items <- app4med2016[, culturalEventQuestions]
+  
+  # makelikert(items, desired.order, activitiesTitle, activitiesFile)
+  likertCERA <- passtolikert(items, orderCERA, newNamesCERA, orderCERA)
+  plot(likertCERA)
+  p <- plot(likertCERA) + ggtitle(CERATitle)
+  print(p)
+```
+
+--- .class #id
+
+## A little assessment: Cultural events - 2015
+
+```{r echo=FALSE, fig.width=16, fig.height=9, cache=FALSE, message=FALSE}
+  items <- app4med2015[, culturalEventQuestions]
+  
+  # makelikert(items, desired.order, activitiesTitle, activitiesFile)
+  likertCERA <- passtolikert(items, orderCERA, newNamesCERA, orderCERA)
+  plot(likertCERA)
+  p <- plot(likertCERA) + ggtitle(CERATitle)
+  print(p)
+```
+
+--- .class #id
+
+## Quick Assessment: Service
+
+### 2016
+`r nrow(app4med2016) - nrow(app4med2016[is.na(app4med2016$ServiceContinue),])` of `r nrow(app4med2016)`, or `r round(((nrow(app4med2016) - nrow(app4med2016[is.na(app4med2016$ServiceContinue),])) / nrow(app4med2016))*100,1)`% expressed a commitment to continue community service.
+
+### 2015
+`r nrow(app4med2015) - nrow(app4med2015[is.na(app4med2015$ServiceContinue),])` of `r nrow(app4med2015)`, or `r round(((nrow(app4med2015) - nrow(app4med2015[is.na(app4med2015$ServiceContinue),])) / nrow(app4med2015))*100,1)`% expressed a commitment to continue community service.
+
+
+--- .class #id
+
+## Qualitative Service
+
+Aryn Cowley
+"The most meaningful service experience I had in Honors was volunteering at the Mother and Daughter TEA (technology,engineering, aptitude) events. During these events, mothers and daughters were exposed to engineering programs at Ferris and were able to work together to complete a small engineering project we had set up for them. I loved being able to be a role model to the younger girls and inspire them to become and engineer. I also enjoyed sharing my knowledge on the projects that the mothers and daughters were working on. Being able to tell my story of wanting to become and engineer and inspiring future generations of engineers is a great feeling.”
+
+Zachary Kramer
+"I had the incredible opportunity to volunteer abroad last summer. I traveled to the Dominican Republic with some of the Pre-Medicine Club. We spent a week traveling to rural villages while providing medical services…Aside from learning valuable healthcare skills, I met the kindest group of people I have ever encountered. The people we served were by far the poorest people I have ever seen. Even though we were there to serve them, they wanted to serve us.”
+
+--- .class #id
+
+## Qualitative Service
+
+Bradley Bohle
+On Service
+"The most meaningful service project that I had while in Honors was helping out some of the flood victims by cleaning out their houses when the river flooded two years ago. It was sad that people lost so much but it had a great impact on me being able to help out some of those families.”
+
+--- .class #id
+
+## Qualitative - On Academics
+
+Michelle Dam
+"Honors Courses has prepared me to think critically. Without it, I would not be challenged through some of my courses.”
+
+Alyssa Divens
+"Honors Course were a place where people who valued academics at the same level as me were able to push each other to achieve better academic outcomes.”
+
+"The Honors Courses actually meant a lot to me and I was able to take a lot from them. I also liked all the intelligent conversation that would come up in these classes."
+
+--- .class #id
+
+## Proud
+
+Melissa Kuziak
+"I will be attending graduate school in the fall to obtain a Master's degree Criminology. I hope to eventually get my Ph.D.”
+
+Ary Cowley
+"After completing the Honors program and graduating with my Bachelor of Science degree in Surveying Engineering from Ferris State, I plan to attend Purdue University in the fall of 2016 and attain a Master's of Science in Engineering with a focus in Photogrammetry.”
+
+Nicole Outman
+"After completing the Honors program I plan to continue my education at Central Michigan University, working towards a Ph.D. in School Psychology.”
+
+Alexandra Costa
+"I will be attending Quinnipiac University in North Haven, CT to earn my Master's degree in Pathology.”
+
+--- .class #id
+
+## Proud
+
+Aaron Zebolsky
+"Entering a Masters of Science in Cancer Chemical Biology at the University of Michigan, then entering medical school and pursuing a career in oncology."
+
+Eli Fesler
+“I am Going to work at DENSO Manufacturing Michigan, INC in Battle Creek, Michigan as a Design Engineer.”
+
+Andrea Crapsey
+"After graduation in August, I will be working full time as a Registered Nurse at Metro Health Hospital in Grand Rapids on the Progressive Care Unit. This will be a stepping stone to my dream job in the Intensive Care Unit. After starting my new job I am looking forward to getting married!”
+
+Melanie Lobsinger
+"I will be working at Champlin Architecture in Cincinnati, OH. I am planning to go to graduate school in 3-4 years."
+
+--- .class #id
+
+## Proud
+
+Lindsey Berndt
+"I will be starting school at University of New England's College of Dental Medicine in the fall.”
+
+Marie MacDonnell
+"After completing the Honors program, I will be attending GVSU for my doctorate in nursing practice.”
+
+Bradley Bohle
+"I plan on going to work for Walsh Construction out of their Indiana Office on various heavy civil projects throughout the Midwest. I might go back to school for my masters in business at some point."
+
+Ashley Beaudry
+"I plan to graduate from Ferris and the Honors Program this May, after which I will begin graduate school in the fall at Marquette University's Physician's Assistant Program.”
+
+Katherine Hart
+"I will be attending medical school (Michigan State University's College of Human Medicine) in the fall of 2016.”
+
+--- .class #id
+
+## Trends we're watching
+
+Retention to completion - esp. of professionals
