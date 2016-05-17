@@ -1,4 +1,4 @@
-source("StudentConn.R")
+source("../StudentConn.R")
 geteligible <- function(semester = "201508", status = "Eligible") {
   demodatatocollect <- paste("Students.Term, Students.ApplicationFor, Students.Ethnicity, Students.Gender, Students.LastCollege, Students.LastMajor, Students.First_Generation, Students.HS_GPA, Students.ACT_COMP, Students.SAT_COMP, Students.EntranceType, Students.FirstSemesterAsHonors, Students.Athlete,  Students.State_Corrected, Students.Zip_Corrected")
   iddata <- paste("Students.ID")
